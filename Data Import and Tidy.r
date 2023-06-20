@@ -7,8 +7,8 @@
 
 # AUTHOR:                 Tom Hook
 # CONTACT:                thomashook1@outlook.com
-# LAST UPDATED            18/06/2023
-# VERSION:                v0.1                              
+# LAST UPDATED            20/06/2023
+# VERSION:                v0.2                             
 
 
 
@@ -33,19 +33,34 @@ setwd(dirname(strPath))
 #--------------------------------------------------------------------------------
 # 1. Load and tidy data
 
-# Set file name
-strFile <- "Carlsen.pgn"
+# Find all PGN files in Downloads folder
+vecFile <- list.files("Downloads", pattern = "\\.pgn$", full.names = TRUE)
 
-# Read data
-tblData <- read.table(strFile, quote="", sep="\n", stringsAsFactors=FALSE)
+# Create vector for Player names
+vecPlayer <- vecFile %>%
+  gsub("\\.pgn", "", .) %>%
+  gsub("Downloads/", "", .)
+
+# Define empty data frame
+tblData <- data.frame(V1 = character(), FileName = character())
+
+# Import all player data frames at once and combine
+for (i in 1:length(vecPlayer)) {
+  print(vecPlayer[i])
+  tblNewData <- read.table(vecFile[i], quote="", sep="\n", stringsAsFactors=FALSE)
+  tblNewData$Player <- vecPlayer[i]
+  tblData <- rbind(tblData, tblNewData)
+}
+
+# Remove final player data frame
+rm(tblNewData)
 
 # Read Opening Reference file (credit to randywolf244 on Lichess)
 tblOpeningRef <- read.csv("Chess Opening Reference.csv")
 
-
-
-# Remove '[', ']' and '"'
-tblData$V1 <- gsub("\\[|\\]|\"", "", tblData$V1)
+# Remove '[', ']' and '"', and replace "??" in dates with "01"
+tblData$V1 <- str_replace_all(tblData$V1, pattern = "\\[|\\]|\"", replacement = "")
+tblData$V1 <- str_replace_all(tblData$V1, pattern = "\\?\\?", replacement = "01")
 
 # Add a column name for moves (they start with a digit...)
 tblData$V1 <- paste0(ifelse(grepl("^\\d", tblData$V1), "Moves ", ""), tblData$V1)
@@ -53,6 +68,7 @@ tblData$V1 <- paste0(ifelse(grepl("^\\d", tblData$V1), "Moves ", ""), tblData$V1
 
 # Splitting the column into two based on first space in string
 tblData <- data.frame(
+  Player = tblData$Player,
   ColumnHeader = str_split_fixed(tblData$V1, " ", n = 2)[, 1],
   Value = str_split_fixed(tblData$V1, " ", n = 2)[, 2]
 )
@@ -79,13 +95,29 @@ tblData$ID <- vecID
 # Combine moves strings into separate table (by default, there's about 8 moves in each row but we want them all together)
 tblMoves <- tblData %>%
   filter(ColumnHeader == "Moves") %>%
-  group_by(ColumnHeader, ID) %>%
+  group_by(ColumnHeader, ID, Player) %>%
   summarize(Value = paste(Value, collapse = " "))
 
-# Remove old moves from tblData and add new combined string
+# Remove old moves from tblData and add new combined string, remove Moves table
 tblData <- tblData %>%
   filter(ColumnHeader != "Moves") %>%
   bind_rows(tblMoves)
+rm(tblMoves)
+
+# Raw data has some uncleansed rows. Let's just keep the rows we're expecting
+tblData <- tblData %>%
+  filter(ColumnHeader %in% c("Event", "Site", "Date", "Round", "White", "Black",
+                      "Result", "WhiteElo", "BlackElo", "ECO" , "Moves"))
+
+# Find Duplicates
+tblDuplicates <- {tblData} %>%
+  group_by(Player, ID, ColumnHeader) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  filter(n > 1L)
+
+# Remove a line from the table that arises from poor DQ. Found in the "TorreRepetto" file on 1925.04.17
+tblData <- tblData %>%
+  filter(Value != "begins to be aggresive and therby he puts himself in the")
 
 
 # Pivot the data
@@ -101,15 +133,15 @@ tblData <- tblData %>%
 
 
 # Set data types of cols
-tblData <- tblData %>%
-  mutate(Date = as.Date(Date, format = "%Y.%m.%d"),
-         WhiteElo = as.integer(WhiteElo),
-         BlackElo = as.integer(BlackElo)
-  )
+#tblData <- tblData %>%
+#  mutate(Date = as.Date(Date, format = "%Y.%m.%d"),
+#         WhiteElo = as.integer(WhiteElo),
+#         BlackElo = as.integer(BlackElo)
+#  )
 
 
 # Drop unnecessary values
-rm(list = setdiff(ls(), c("tblData", "tblOpeningRef")))
+rm(list = setdiff(ls(), c("tblData", "tblOpeningRef", "start")))
 
 
 
@@ -141,16 +173,17 @@ tblData <- tblData %>%
     CastleDirection = ifelse(grepl("O-O-O", Moves), "Long castle",
                              ifelse(grepl("O-O", Moves), "Short castle", NA)),
     
-    # Elo bucket (nearest 100)
-    WhiteEloRounded = round(WhiteElo, -2),
-    BlackEloRounded = round(BlackElo, -2),
-    
-    # Elo for the master and opponent
+    # Elo for the player and opponent
     MasterElo = ifelse(grepl("Carlsen", tblData$White), WhiteElo, BlackElo),
     OpponentElo = ifelse(grepl("Carlsen", tblData$White), BlackElo, WhiteElo)
   )
 
 print("script complete")
 
-test <- tblData %>%
-  filter(Black == "Carlsen,Magnus")
+end <- Sys.time()
+print(end - start)
+
+# Note to self:
+# What time lengths are the games? Mode? e.g. classical vs rapid etc.
+# use this site https://ratings.fide.com/profile/1503014/chart
+# for elo charts, take unique events! removes the same level dots
