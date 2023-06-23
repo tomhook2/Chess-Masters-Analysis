@@ -7,8 +7,8 @@
 
 # AUTHOR:                 Tom Hook
 # CONTACT:                thomashook1@outlook.com
-# LAST UPDATED            22/06/2023
-# VERSION:                v0.3                             
+# LAST UPDATED            23/06/2023
+# VERSION:                v0.4                             
 
 
 
@@ -39,13 +39,8 @@ vecFile <- list.files("Downloads", pattern = "\\.pgn$", full.names = TRUE)
 # Define empty data frame
 tblData <- data.frame(V1 = character(), FileName = character())
 
-# Create vector for Player names
-vecPlayer <- vecFile %>%
-  gsub("\\.pgn", "", .) %>%
-  gsub("Downloads/", "", .)
-
 # Import all player data frames at once and combine
-for (i in 1:floor(length(vecFile)/8)) {
+for (i in 1:floor(length(vecFile)/1)) {
   # Read PGN file
   tblNewData <- read.table(vecFile[i], quote="", sep="\n", stringsAsFactors=FALSE)
   
@@ -150,6 +145,12 @@ tblData <- pivot_wider(tblData, names_from = ColumnHeader, values_from = Value)
 #--------------------------------------------------------------------------------
 # 1.1 Fix/remove poor data quality
 
+# Rename WhiteElo -> EloWhite and same for black
+tblData <- tblData %>%
+  rename(EloWhite = WhiteElo) %>%
+  rename(EloBlack = BlackElo)
+
+
 # Some moves have game data before the first move. Remove so PGN can be recognised.
 tblData <- tblData %>%
   mutate(Moves = sub(".*?(1.*)", "\\1", Moves))
@@ -157,13 +158,11 @@ tblData <- tblData %>%
 
 # Remove doubles games (Staunton Mem Consultation game: Short/Vujatovic/Kasparov/Crumiller)
 tblData <- tblData %>%
-  filter(!grepl(":", WhiteElo))
+  filter(!grepl(":", EloWhite))
 
 # Remove games where White pieces player is the same as the Black pieces play
 tblData <- tblData %>%
-  filter(
-    White != Black 
-  )
+  filter(White != Black)
 
 # This leaves 1 DQ problem. Lasker, Edward vs Lasker, Emanuel from 1924, they played twice.
 # I'm just going to remove them for now to get rid of the issue. This probably needs revisiting.
@@ -194,17 +193,17 @@ tblData <- tblData %>%
 
 # Convert blanks in Elo, and ? in Round to NAs so the columns can be converted to integer type
 tblData <- tblData %>% 
-  mutate(WhiteElo = na_if(WhiteElo, ""),
-         BlackElo = na_if(BlackElo, ""),
-         WhiteElo = na_if(WhiteElo, "?"),
-         BlackElo = na_if(BlackElo, "?"),
+  mutate(EloWhite = na_if(EloWhite, ""),
+         EloBlack = na_if(EloBlack, ""),
+         EloWhite = na_if(EloWhite, "?"),
+         EloBlack = na_if(EloBlack, "?"),
          Round = na_if(Round, "?"))
 
 # Set data types of cols
 tblData <- tblData %>%
   mutate(Date = as.Date(Date, format = "%Y.%m.%d"),
-         WhiteElo = as.integer(WhiteElo),
-         BlackElo = as.integer(BlackElo)
+         EloWhite = as.integer(EloWhite),
+         EloBlack = as.integer(EloBlack)
   )
 
 
@@ -234,34 +233,54 @@ tblData <- tblData %>%
     # Result
     Result = sub(".+\\s(.+)$", "\\1", Moves),
     
+    # White/Black for master/opponent
+    PiecesMaster = ifelse(str_detect(White, Player), "White",
+                          ifelse(str_detect(Black, Player), "Black", NA)),
+    PiecesOpponent = ifelse(str_detect(White, Player), "Black",
+                            ifelse(str_detect(Black, Player), "White", NA)),
+    
+    # Did castle occur; White/Black/Master/Opponent
+    CastleWhite = ifelse(grepl(".O-O", Moves), TRUE, FALSE),
+    CastleBlack = ifelse(grepl(" O-O", Moves), TRUE, FALSE),
+    CastleMaster = ifelse(PiecesMaster == "White", CastleWhite, CastleBlack),
+    CastleOpponent = ifelse(PiecesOpponent == "White", CastleWhite, CastleBlack),
+    
+    
+    # Castle direction; White/Black/Master/Opponent
+    CastleDirectionWhite = ifelse(grepl(".O-O-O", Moves), "Long castle",
+                             ifelse(grepl(".O-O", Moves), "Short castle", NA)),
+    CastleDirectionBlack = ifelse(grepl(" O-O-O", Moves), "Long castle",
+                                  ifelse(grepl(" O-O", Moves), "Short castle", NA)),
+    CastleDirectionMaster = ifelse(PiecesMaster == "White", CastleDirectionWhite, CastleDirectionBlack),
+    CastleDirectionOpoonent = ifelse(PiecesOpponent == "White", CastleDirectionWhite, CastleDirectionBlack),
+    
     # Move count
     MoveCount = str_count(Moves, "\\."),
     
     # No. captures
     CaptureCount = str_count(Moves, "x"),
     
-    # Did castle occur? 
-    Castle = ifelse(grepl("O-O", Moves), TRUE, FALSE),
+    # Result; White/Black/Master/Opponent
+    ResultWhite = ifelse(Result == "1-0", "Win",
+                          ifelse(Result == "0-1", "Loss", "Draw")),
+    ResultBlack = ifelse(Result == "1-0", "Loss",
+                         ifelse(Result == "0-1", "Win", "Draw")),
+    ResultMaster = ifelse(PiecesMaster == "White", ResultWhite, ResultBlack),
+    ResultOpponent = ifelse(PiecesOpponent == "White", ResultWhite, ResultBlack),
     
-    # Castle direction
-    CastleDirection = ifelse(grepl("O-O-O", Moves), "Long castle",
-                             ifelse(grepl("O-O", Moves), "Short castle", NA)),
+    # Elo for the master/opponent
+    EloMaster = ifelse(str_detect(White, Player), EloWhite,
+                          ifelse(str_detect(Black, Player), EloBlack, NA)),
     
-    # White/Black for master
-    MasterPieces = ifelse(str_detect(White, Player), "White",
-                          ifelse(str_detect(Black, Player), "Black", NA)),
+    EloOpponent = ifelse(str_detect(White, Player), EloBlack,
+                          ifelse(str_detect(Black, Player), EloWhite, NA)),
     
-    # White/Black for opponent
-    OpponentPieces = ifelse(str_detect(White, Player), "Black",
-                          ifelse(str_detect(Black, Player), "White", NA)),
+    # Is Ben Finegold Happy?
+    Isf3PlayedWhite = ifelse(grepl("\\.f3", Moves), TRUE, FALSE),
+    Isf3PlayedBlack = ifelse(grepl(" f6", Moves), TRUE, FALSE),
+    Isf3PlayedMaster = ifelse(PiecesMaster == "White", Isf3PlayedWhite, Isf3PlayedBlack),
+    Isf3PlayedOpponent = ifelse(PiecesOpponent == "White", Isf3PlayedWhite, Isf3PlayedBlack)
     
-    # Elo for the master 
-    MasterElo = ifelse(str_detect(White, Player), WhiteElo,
-                          ifelse(str_detect(Black, Player), BlackElo, NA)),
-    
-    # Elo for the opponent
-    OpponentElo = ifelse(str_detect(White, Player), BlackElo,
-                          ifelse(str_detect(Black, Player), WhiteElo, NA))
   ) %>%
 
   # Remove games where result is "*"
@@ -276,7 +295,10 @@ print(Sys.time() - start)
 
 
 # Note to self:
-# File name doesnt have full name
+# Create white moves and black moves.
+# Split castling by if white or black castled? And direction
+# White capture count, black capture count. Also split by master vs opponent? not sure
+# Replace "White" and "Black" values by the master to be consistent. e.g. Adams, Michael -> Adams, M.
 
 # What time lengths are the games? Mode? e.g. classical vs rapid etc.
 # use this site https://ratings.fide.com/profile/1503014/chart
