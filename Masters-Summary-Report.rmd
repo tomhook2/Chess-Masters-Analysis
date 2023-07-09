@@ -1,0 +1,89 @@
+---
+title: "Chess Masters Summary Report"
+author: "Tom Hook"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: 
+  html_document:
+      toc: true
+      toc_float: true
+---
+
+```{r, echo = FALSE}
+# FILE:                   Masters Summary Report
+# DESCRIPTION:            Creates a masters level table from the games data.
+
+# AUTHOR:                 Tom Hook
+# CONTACT:                thomashook1@outlook.com
+# LAST UPDATED:           08/07/2023
+# VERSION:                v0.2    
+```
+
+```{r setup, echo = FALSE, message = FALSE}
+source("R Scripts/Snippets for Markdown/Setup.r")
+```
+
+# Summary{.tabset}
+
+## Section 1 
+
+This is section 1
+
+## Section 2
+
+This is section 2
+
+The highest rated player ever is `r tblGames$Master[which.max(tblGames$EloMaster)]`
+
+# Profiles
+
+```{r, echo = FALSE, results = 'asis'}
+for (i in 1:nrow(tblProfiles)) {
+  # Create section for each master (used in TOC)
+  cat(paste0("## ", tblProfiles$Master[i], "\n\n"))
+  
+  # Filter the data for the current master
+  tblMasterGames <- tblGames %>%
+    filter(FIDE_ID == tblProfiles$FIDE_ID[i])
+
+  # Create elo timeseries charts
+  source("R Scripts/Snippets for Markdown/Elo Timeseries.r")
+  
+  # Print the plot and ignore warnings
+  suppressWarnings({
+    print(plotEloTimeseries)
+  })
+  
+  # problem with the data... elos randomly dropping? gahhh
+  
+  # Load common openings tables
+  source("R Scripts/Snippets for Markdown/Common Openings.r")
+  
+  # Add a blank line between the plot and table
+  cat("\n\n")
+  
+  # Print the top 3 openings with desired format ADD WHITE VS BLACK HERE
+  cat("Most common openings with the white pieces:\n\n")
+  for (i in 1:3) {
+    cat(paste0(i, ". ", tblTop3OpeningsWhite$Opening[i], ". ", tblTop3OpeningsWhite$count[i], " times.", "\n"), 
+        sep="\n")
+  }
+  
+  # Add a blank line after the list
+  cat("\n\n")
+  
+  # Print the top 3 openings with desired format ADD WHITE VS BLACK HERE
+  cat("Most common openings with the black pieces:\n\n")
+  for (i in 1:3) {
+    cat(paste0(i, ". ", tblTop3OpeningsBlack$Opening[i], ". ", tblTop3OpeningsBlack$count[i], " times.", "\n"), 
+        sep="\n")
+  }
+  
+  # Add a blank line after the list
+  cat("\n\n")
+  
+  
+}
+```
+
+Consider loading moves into PGN reader with a link to https://chesstempo.com/pgn-viewer/                   
+                   

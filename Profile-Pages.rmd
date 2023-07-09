@@ -1,0 +1,124 @@
+---
+title: "`r Master` Profile"
+author: "Tom Hook"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      bg: "#FFFFFF"
+      fg: "#000000"
+      primary: "#FFFFFF"
+      base_font:
+        google: Open Sans
+      code_font:
+        google: JetBrains Mono
+    orientation: columns
+    vertical_layout: fill
+params:
+  Master:
+    label: "Select a Master"
+    value: ""
+---
+
+```{r, echo = FALSE}
+# FILE:                   Games Table
+# DESCRIPTION:            Creates a table of all the masters games that the users can filter on.
+
+# AUTHOR:                 Tom Hook
+# CONTACT:                thomashook1@outlook.com
+# LAST UPDATED:           09/07/2023
+# VERSION:                v0.2    
+```
+
+```{r setup, echo = FALSE, message = FALSE}
+source("R Scripts/Snippets for Markdown/Setup.r")
+```
+
+Summary Page
+=====
+
+Column {data-width=600}
+-----
+
+### FIDE Rating over Time
+
+```{r}
+source("R Scripts/Snippets for Markdown/Elo Timeseries.r")
+
+plotEloTimeseries
+```
+
+Column {.tabset .tabset-fade}
+-----
+
+```{r}
+source("R Scripts/Snippets for Markdown/Common Openings.r")
+source("R Scripts/Snippets for Markdown/Result Distribution.r")
+```
+
+### All Games
+
+`r Master` playing with either White or Black pieces.
+
+##### Most common openings played:
+
+```{r}
+tblOpenings
+
+# Add a blank line after the list
+  cat("\n\n")
+```
+
+##### Result Distribution:
+
+```{r  fig.width=5, fig.height=4}
+plotWinRate
+```
+
+### With White Pieces
+
+`r Master` playing with White pieces.
+
+##### Most common openings played:
+
+```{r}
+tblOpeningsWhite
+
+# Add a blank line
+  cat("\n\n")
+  
+```
+
+##### Result Distribution:
+
+```{r  fig.width=5, fig.height=4}
+plotWinRateWhite
+```
+
+### With Black Pieces
+
+`r Master` playing with Black pieces.
+
+##### Most common openings played:
+
+```{r}
+tblOpeningsBlack
+
+# Add a blank line after the list
+  cat("\n\n")
+```
+
+##### Result Distribution:
+
+```{r  fig.width=5, fig.height=4}
+plotWinRateBlack
+```
+
+List of Games
+=====
+
+```{r, echo = FALSE, warning = FALSE}
+source("R Scripts/Snippets for Markdown/Table of Master Games.r")
+
+tblMasterGames
+```
