@@ -1,0 +1,26 @@
+```{r, echo = FALSE}
+tblData <- readRDS("Chess Masters Data.rds")
+
+PlayerName <- tblData %>%
+  group_by(Master) %>%
+  summarize(
+    Count = n(),
+    Percentage_TRUE = mean(Isf3PlayedMaster) * 100
+  ) %>%
+  filter(Count >= 100) %>%
+  arrange(desc(Percentage_TRUE)) %>%
+  slice(1) %>%
+  pull(Master)
+```
+
+
+## Part 1
+
+The highest rated player is `r tblData$Master[which.max(tblData$EloMaster)]`.
+
+`r PlayerName` played f3 or f6 the most often (of players with at least 100 games)
+
+
+
+
+Magnus hit his peak elo on `r tblMasters$MaxDate[tblMasters$Master == 'Carlsen, M']`

@@ -29,8 +29,13 @@ setwd(dirname(dirname(dirname(strPath))))
 # Numbers below are the character lengths of each column
 tblColumns <- fwf_widths(c(15, 61, 4, 4, 5, 5, 15, 4, 6, 4, 3, 6, 4, 3, 6, 4, 3, 6, 4))
 
+# Extract the zip file
+zipfile <- "Downloads/players_list.zip"
+unzip(zipfile, exdir = "temp")
+
 # Read the file
-tblPlayers <- read_fwf("Downloads/players_list_foa.txt", col_positions = tblColumns)
+strFilePath <- file.path("temp", "players_list_foa.txt")
+tblPlayers <- read_fwf(strFilePath, col_positions = tblColumns)
 
 # Promote the first row as column headers
 colnames(tblPlayers) <- as.character(unlist(tblPlayers[1, ]))
@@ -60,7 +65,8 @@ tblPlayers <- tblPlayers %>%
 # Write as RDS file
 saveRDS(tblPlayers, "Data Outputs/Titled Players.rds")
 
-
+# Clean up by deleting the temporary directory
+unlink("temp", recursive = TRUE)
 
 
 

@@ -1,0 +1,8 @@
+# Ignore .Rproj.user
+.Rproj.user*
+
+# Ignore libs
+libs*
+
+# Ignore Profiles folder for now
+Profiles
