@@ -1,17 +1,10 @@
 ---
-title: "`r Master` Profile"
+title: "Profile: `r Master`"
 author: "Tom Hook"
-date: "`r format(Sys.Date(), '%B %d, %Y')`"
+date: "`r format(Sys.Date(), '%d %B %y')`"
 output: 
   flexdashboard::flex_dashboard:
-    theme:
-      bg: "#FFFFFF"
-      fg: "#000000"
-      primary: "#FFFFFF"
-      base_font:
-        google: Open Sans
-      code_font:
-        google: JetBrains Mono
+    css: styles.css
     orientation: columns
     vertical_layout: fill
 params:
@@ -30,17 +23,34 @@ params:
 # VERSION:                v0.2    
 ```
 
-```{r setup, echo = FALSE, message = FALSE}
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
 source("R Scripts/Snippets for Markdown/Setup.r")
 ```
 
 Summary Page
 =====
 
-Column {data-width=600}
+Column {data-width=300}
 -----
 
-### FIDE Rating over Time
+```{r}
+source("R Scripts/Snippets for Markdown/Profile Stats.r")
+```
+
+### <span style="font-size:x-large;">Profile</span>
+
+
+`r Master`'s peak elo is `r intEloMax`. They first had this rating when playing a game on `r format(dateEloMax, "%d %b %Y")`.
+
+You can access their FIDE profile [here](https://ratings.fide.com/profile/`r FIDEID`){target="_blank"}.
+
+
+Column {data-width=400}
+-----
+
+### <span style="font-size:x-large;">TEST</span>
+
+### <span style="font-size:x-large;">FIDE Rating over Time</span>
 
 ```{r}
 source("R Scripts/Snippets for Markdown/Elo Timeseries.r")
@@ -48,7 +58,7 @@ source("R Scripts/Snippets for Markdown/Elo Timeseries.r")
 plotEloTimeseries
 ```
 
-Column {.tabset .tabset-fade}
+Column {.tabset .tabset-fade data-width=300}
 -----
 
 ```{r}
@@ -56,62 +66,48 @@ source("R Scripts/Snippets for Markdown/Common Openings.r")
 source("R Scripts/Snippets for Markdown/Result Distribution.r")
 ```
 
-### All Games
+<span style="font-size:x-large;">Stats by White/Black Pieces</span>
 
-`r Master` playing with either White or Black pieces.
+### <span style="font-size:large;">Combined</span>
 
 ##### Most common openings played:
 
 ```{r}
 tblOpenings
-
-# Add a blank line after the list
-  cat("\n\n")
 ```
 
 ##### Result Distribution:
 
 ```{r  fig.width=5, fig.height=4}
-plotWinRate
+plotResults
 ```
 
-### With White Pieces
-
-`r Master` playing with White pieces.
+### <span style="font-size:large;">White</span>
 
 ##### Most common openings played:
 
 ```{r}
 tblOpeningsWhite
-
-# Add a blank line
-  cat("\n\n")
-  
 ```
 
 ##### Result Distribution:
 
 ```{r  fig.width=5, fig.height=4}
-plotWinRateWhite
+plotResultsWhite
 ```
 
-### With Black Pieces
-
-`r Master` playing with Black pieces.
+### <span style="font-size:large;">Black</span>
 
 ##### Most common openings played:
 
 ```{r}
 tblOpeningsBlack
-
-# Add a blank line after the list
-  cat("\n\n")
 ```
 
 ##### Result Distribution:
 
 ```{r  fig.width=5, fig.height=4}
-plotWinRateBlack
+plotResultsBlack
 ```
 
 List of Games

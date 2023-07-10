@@ -1,8 +1,8 @@
 tblMasterGames <- tblGames %>%
   filter(FullName == params$Master)
 
-tblMasterGames <- tblMasterGames[ , c("Event", "Date", "Master", "Opponent", "PiecesMaster", "EloMaster", "EloOpponent",
-                                      "Result", "ECO", "Opening", "Moves")]
+tblMasterGames <- tblMasterGames[ , c("Master", "Date", "Event", "Opponent", "PiecesMaster", "EloMaster", "EloOpponent",
+                                      "ResultMaster", "ECO", "Opening", "Moves")]
                           
 
 tblMasterGames <- datatable(tblMasterGames, 
@@ -10,8 +10,8 @@ tblMasterGames <- datatable(tblMasterGames,
                             extensions = 'Buttons',
                             options = list(
                               dom = 'Blfrtip',
-                              #buttons = c('copy', 'csv', 'pdf', 'print'),
-                              buttons = c(''),
+                              buttons = c('copy', 'csv', 'print'),
+                              #buttons = c(''),
                               lengthMenu = list(c(10, 25, 50, 100), c(10, 25, 50, 100))
                             )
                   )

@@ -1,33 +1,28 @@
-# Filter for current master
-tblMasterGames <- tblGames %>%
-  filter(FullName == params$Master)
+# Define tables for all/white/black
+tblOpenings <- tblGames
+tblOpeningsWhite <- tblGames %>%
+  filter(PiecesMaster == "White")
+tblOpeningsBlack <- tblGames %>%
+  filter(PiecesMaster == "Black")
 
-# Table of most common openings by Master 
-tblOpenings <- tblMasterGames %>%
-  group_by(Opening) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  rename(`Game Count` = count) %>%
-  slice(1:10) %>%
-  kable()
+# Create vector for the 3 tables
+vecOpeningsTables <- c("tblOpenings", "tblOpeningsWhite", "tblOpeningsBlack")
 
-# Table of most common openings by Master for white pieces
-tblOpeningsWhite <- tblMasterGames %>%
-  filter(PiecesMaster == "White") %>%
-  group_by(Opening) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  slice(1:10) %>%
-  rename(`Game Count` = count) %>%
-  kable()
-
-
-# Table of most common openings by Master for white pieces
-tblOpeningsBlack <- tblMasterGames %>%
-  filter(PiecesMaster == "Black") %>%
-  group_by(Opening) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  rename(`Game Count` = count) %>%
-  slice(1:10) %>%
-  kable()
+for (i in seq_along(vecOpeningsTables)) {
+  tblTemp <- get(vecOpeningsTables[i]) %>%
+    filter(FullName == params$Master) %>%
+    group_by(Opening) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count)) %>%
+    rename(`Game Count` = count) %>%
+    slice(1:10) %>%
+    gt() %>%
+    tab_style(
+      locations = cells_body(),  # Specify the locations where styling should be applied
+      style = list(
+        cell_text(size = px(12))  # Adjust the font size here (e.g., px(12))
+      )
+    )
+  
+  assign(vecOpeningsTables[i], tblTemp)  # Assign the modified data frame back to the original name
+}

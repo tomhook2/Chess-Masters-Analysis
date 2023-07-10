@@ -21,8 +21,7 @@ if (nrow(tblEloTimeseries) == 0) {
   
   plotEloTimeseries <- ggplot(tblEloTimeseries, aes(x = Date, y = EloMaster)) +
     geom_line() +
-    labs(title = paste("FIDE Rating over Time for", Master),
-         y = "Elo") +
+    labs(x = "Date", y = "Elo") +
     theme_classic() +
     theme(panel.grid.major.y = element_line(color = "gray", linetype = "longdash", size = 0.5),
           panel.grid.minor = element_blank()) +

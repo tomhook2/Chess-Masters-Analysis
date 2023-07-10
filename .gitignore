@@ -6,3 +6,9 @@ libs*
 
 # Ignore Profiles folder for now
 Profiles
+
+# Ignore Archive folder
+Archive
+
+# Ignore rhistory
+.Rhistory

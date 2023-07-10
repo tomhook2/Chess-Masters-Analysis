@@ -9,7 +9,7 @@ setwd(dirname(strPath))
 
 tblProfiles <- read.csv("Data Outputs/Profiles.csv")
 
-for (Master in tblProfiles$FullName[1]) {
+for (Master in tblProfiles$FullName[39]) {
   rmarkdown::render(
     input = "Profile-Pages.Rmd",
     output_file = file.path("Profiles", paste0(Master, ".html")),
