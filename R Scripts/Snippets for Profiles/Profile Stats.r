@@ -3,7 +3,7 @@ tblMasterProfile <- tblProfiles %>%
   filter(FullName == params$Master)
 
 tblMasterGames <- tblGames %>%
-  filter(FullName == "Magnus Carlsen")
+  filter(FullName == params$Master)
 
 intEloMax <- max(tblMasterGames$EloMaster, na.rm = TRUE)
 
@@ -11,6 +11,5 @@ dateEloMax <- min(tblMasterGames$Date[which(tblMasterGames$EloMaster == intEloMa
 
 intGames <- nrow(tblMasterGames)
 
-FIDEID <- tblMasterProfile$FIDE_ID[1]
-
+strFed <- tblMasterProfile$Fed
 

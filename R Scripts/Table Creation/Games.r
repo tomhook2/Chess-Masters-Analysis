@@ -276,8 +276,15 @@ tblGames <- tblGames %>%
     # Move count
     MoveCount = str_count(Moves, "\\."),
     
+    # Moves for each side
+    MovesWhite = sapply(str_extract_all(Moves, "\\w+\\.\\w+(-\\w+)?"), paste, collapse = " "),
+    MovesBlack = sapply(str_extract_all(Moves, "(?<=\\s)\\w+(?=\\s\\d+\\.)|O-O"), paste, collapse = " "),
+    MovesBlack = str_replace(MovesBlack, "\\s*(1-0|1/2 - 1/2|0-1)\\s*$", ""),
+    MovesBlack = strsplit(MovesBlack, "\\s+"),
+    MovesBlack = purrr::map_chr(MovesBlack, function(move) paste0(seq_along(move), ".", move, collapse = " ")),
+    
     # No. captures
-    CaptureCount = str_count(Moves, "x"),
+    Captures = str_count(Moves, "x"),
     
     # Result; White/Black/Master/Opponent
     ResultWhite = ifelse(Result == "1-0", "Win",
@@ -316,9 +323,5 @@ print("script complete")
 
 # Note to self:
 
-# need a creative solution to add ID to the Masters dataset. joining on name isn't ideal...
-# maybe add ID to the masters table manually? 
-
 # What time lengths are the games? Mode? e.g. classical vs rapid etc.
 # use this site https://ratings.fide.com/profile/1503014/chart
-# for elo charts, take unique events! removes the same level dots

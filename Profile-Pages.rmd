@@ -24,7 +24,7 @@ params:
 ```
 
 ```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
-source("R Scripts/Snippets for Markdown/Setup.r")
+source("R Scripts/Snippets for Profiles/Setup.r")
 ```
 
 Summary Page
@@ -34,47 +34,54 @@ Column {data-width=300}
 -----
 
 ```{r}
-source("R Scripts/Snippets for Markdown/Profile Stats.r")
+source("R Scripts/Snippets for Profiles/Profile Stats.r")
+source("R Scripts/Snippets for Profiles/Games Per Year.r")
 ```
 
 ### <span style="font-size:x-large;">Profile</span>
 
+Full Name: `r Master`
 
-`r Master`'s peak elo is `r intEloMax`. They first had this rating when playing a game on `r format(dateEloMax, "%d %b %Y")`.
+``` {r, echo = FALSE, results = 'asis'}
+if (is.na(tblMasterProfile$FIDE_ID[1])) {
+  cat("This player does not have a FIDE profile.")
+} else {
+  cat("Year of Birth: ", tblMasterProfile$B.day[1], "\n\n")
+  cat("Peak Elo: ", intEloMax, "\n\n")
+  cat(paste0("You can access their FIDE profile [here](https://ratings.fide.com/profile/", tblMasterProfile$FIDE_ID[1],           "){target=\"_blank\"}.", "\n\n"))
+}
+```
 
-You can access their FIDE profile [here](https://ratings.fide.com/profile/`r FIDEID`){target="_blank"}.
-
+There are `r nrow(tblMasterGames)` games available in the dataset for `r Master`. `r format(dateGamesMax, "%Y")` was the year with most games recorded for, at `r max(tblGamesPerYear$Count)`.  
 
 Column {data-width=400}
 -----
 
-### <span style="font-size:x-large;">TEST</span>
-
 ### <span style="font-size:x-large;">FIDE Rating over Time</span>
 
 ```{r}
-source("R Scripts/Snippets for Markdown/Elo Timeseries.r")
+source("R Scripts/Snippets for Profiles/Elo Timeseries.r")
 
 plotEloTimeseries
+```
+
+### <span style="font-size:x-large;">Games Per Year in the Database</span>
+
+```{r}
+plotGamesPerYear
 ```
 
 Column {.tabset .tabset-fade data-width=300}
 -----
 
 ```{r}
-source("R Scripts/Snippets for Markdown/Common Openings.r")
-source("R Scripts/Snippets for Markdown/Result Distribution.r")
+source("R Scripts/Snippets for Profiles/Common Openings.r")
+source("R Scripts/Snippets for Profiles/Result Distribution.r")
 ```
 
 <span style="font-size:x-large;">Stats by White/Black Pieces</span>
 
 ### <span style="font-size:large;">Combined</span>
-
-##### Most common openings played:
-
-```{r}
-tblOpenings
-```
 
 ##### Result Distribution:
 
@@ -82,13 +89,13 @@ tblOpenings
 plotResults
 ```
 
-### <span style="font-size:large;">White</span>
-
 ##### Most common openings played:
 
 ```{r}
-tblOpeningsWhite
+tblOpenings
 ```
+
+### <span style="font-size:large;">White</span>
 
 ##### Result Distribution:
 
@@ -96,13 +103,13 @@ tblOpeningsWhite
 plotResultsWhite
 ```
 
-### <span style="font-size:large;">Black</span>
-
 ##### Most common openings played:
 
 ```{r}
-tblOpeningsBlack
+tblOpeningsWhite
 ```
+
+### <span style="font-size:large;">Black</span>
 
 ##### Result Distribution:
 
@@ -110,11 +117,17 @@ tblOpeningsBlack
 plotResultsBlack
 ```
 
+##### Most common openings played:
+
+```{r}
+tblOpeningsBlack
+```
+
 List of Games
 =====
 
 ```{r, echo = FALSE, warning = FALSE}
-source("R Scripts/Snippets for Markdown/Table of Master Games.r")
+source("R Scripts/Snippets for Profiles/Table of Master Games.r")
 
-tblMasterGames
+dtMasterGames
 ```

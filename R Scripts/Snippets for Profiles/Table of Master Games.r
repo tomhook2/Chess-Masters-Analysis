@@ -5,7 +5,9 @@ tblMasterGames <- tblMasterGames[ , c("Master", "Date", "Event", "Opponent", "Pi
                                       "ResultMaster", "ECO", "Opening", "Moves")]
                           
 
-tblMasterGames <- datatable(tblMasterGames, 
+dtMasterGames <- datatable(tblMasterGames,
+                            colnames = c("Master", "Date", "Event", "Opponent", "Master Pieces", "Master Elo", "Opponent Elo",
+                                         "Master Result", "ECO", "Opening", "Moves"),
                             filter = 'top', 
                             extensions = 'Buttons',
                             options = list(

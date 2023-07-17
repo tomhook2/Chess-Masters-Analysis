@@ -1,0 +1,10 @@
+---
+title: "Chess Masters Analysis"
+author: "Tom Hook"
+date: "`r format(Sys.Date(), '%d %B %y')`"
+output: 
+  flexdashboard::flex_dashboard:
+    css: styles.css
+    orientation: columns
+    vertical_layout: fill
+---
