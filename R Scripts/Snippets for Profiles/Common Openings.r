@@ -18,11 +18,11 @@ for (i in seq_along(vecOpeningsTables)) {
     slice(1:10) %>%
     gt() %>%
     tab_style(
-      locations = cells_body(),  # Specify the locations where styling should be applied
+      locations = cells_body(),
       style = list(
-        cell_text(size = px(12))  # Adjust the font size here (e.g., px(12))
+        cell_text(size = px(12)) 
       )
     )
   
-  assign(vecOpeningsTables[i], tblTemp)  # Assign the modified data frame back to the original name
+  assign(vecOpeningsTables[i], tblTemp)
 }

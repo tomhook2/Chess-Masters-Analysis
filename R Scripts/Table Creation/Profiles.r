@@ -27,7 +27,7 @@ setwd(dirname(dirname(dirname(strPath))))
 
 # Read data
 
-tblPlayers <- readRDS("Data Outputs/Titled Players.rds")
+tblPlayers <- readRDS("Data Outputs/FIDE Players.rds")
 tblMastersID <- read.csv("FIDE IDs.csv")
 
 # Credit to https://www.chessgames.com/alpha3.html for making the countries download available
@@ -48,12 +48,12 @@ tblProfiles <- tblProfiles[, c("FIDE_ID", setdiff(names(tblProfiles), "FIDE_ID")
 tblProfiles <- tblProfiles %>%
   left_join(tblCountries, by = "Fed")
 
+# Remove Carlos Torre Repetto data due to poor DQ
+tblProfiles <- tblProfiles %>%
+  filter(Master != "Torre Repetto, C")
+
 # Save file at game level to be used in r markdown
 write.csv(tblProfiles, "Data Outputs/Profiles.csv", row.names = FALSE)
-
-
-# IDs could be wrong if the master hasn't got a FIDE profile, but there was a match for them from another person
-# Need to review this
 
 
 

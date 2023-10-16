@@ -17,7 +17,7 @@ for (i in seq_along(vecResultsTables)) {
     mutate(Percentage = (Count / sum(Count)) * 100) %>%
     mutate(ResultMaster = factor(ResultMaster, levels = c("Win", "Draw", "Loss")))
   
-  assign(vecResultsTables[i], tblTemp)  # Assign the modified data frame back to the original name
+  assign(vecResultsTables[i], tblTemp) 
   
   # Create the plot for each table
   plotName <- paste0("plot", sub("^tbl", "", vecResultsTables[i], ignore.case = TRUE))

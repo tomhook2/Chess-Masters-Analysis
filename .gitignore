@@ -5,10 +5,13 @@
 libs*
 
 # Ignore Profiles folder for now
-Profiles
+#Profiles
 
 # Ignore Archive folder
 Archive
 
 # Ignore rhistory
 .Rhistory
+
+Power BI
+

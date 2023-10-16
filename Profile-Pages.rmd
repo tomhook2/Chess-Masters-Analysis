@@ -1,7 +1,7 @@
 ---
 title: "Profile: `r Master`"
 author: "Tom Hook"
-date: "`r format(Sys.Date(), '%d %B %y')`"
+#date: "`r format(Sys.Date(), '%d %B %y')`"
 output: 
   flexdashboard::flex_dashboard:
     css: styles.css
@@ -52,7 +52,15 @@ if (is.na(tblMasterProfile$FIDE_ID[1])) {
 }
 ```
 
-There are `r nrow(tblMasterGames)` games available in the dataset for `r Master`. `r format(dateGamesMax, "%Y")` was the year with most games recorded for, at `r max(tblGamesPerYear$Count)`.  
+There are `r nrow(tblMasterGames)` games available in the dataset for `r Master`. `r format(dateGamesMax, "%Y")` was the year with most games recorded for, at `r max(tblGamesPerYear$Count)`.
+
+### <span style="font-size:x-large;">Most Common Opponents</span>
+
+```{r}
+source("R Scripts/Snippets for Profiles/Opponent Stats.r")
+
+tblOpponentsCount
+```
 
 Column {data-width=400}
 -----

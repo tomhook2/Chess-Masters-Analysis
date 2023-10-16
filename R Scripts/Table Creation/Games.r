@@ -187,7 +187,9 @@ tblGames <- tblGames %>%
 
 # Li Chao's name is "Li Chao2", let's fix that
 tblGames <- tblGames %>%
-  mutate(Master = ifelse(Master == "Li Chao2", "Li Chao", Master))
+  mutate(Master = ifelse(Master == "Li Chao2", "Li Chao", Master)) %>%
+  mutate(White = ifelse(White == "Li Chao2", "Li Chao", White)) %>%
+  mutate(Black = ifelse(Black == "Li Chao2", "Li Chao", Black))
 
 # Remove games that the Master string isn't in either "White" or "Black" columns
 tblGames <- tblGames %>%

@@ -63,7 +63,7 @@ tblPlayers <- tblPlayers %>%
 
 
 # Write as RDS file
-saveRDS(tblPlayers, "Data Outputs/Titled Players.rds")
+saveRDS(tblPlayers, "Data Outputs/FIDE Players.rds")
 
 # Clean up by deleting the temporary directory
 unlink("temp", recursive = TRUE)
