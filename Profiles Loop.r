@@ -11,7 +11,7 @@ tblProfiles <- read.csv("Data Outputs/Profiles.csv")
 
 dateFIDEDownload <- as.Date("2023-06-30")
 
-for (Master in tblProfiles$FullName[119:244]) {
+for (Master in tblProfiles$FullName) {
   rmarkdown::render(
     input = "Profile-Pages.Rmd",
     output_file = file.path("Profiles", paste0(Master, ".html")),
